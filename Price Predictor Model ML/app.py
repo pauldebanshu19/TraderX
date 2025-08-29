@@ -4,32 +4,29 @@ import pickle
 
 app = Flask(__name__)
 
-# ===============================
-# Load model + feature names
-# ===============================
+# Load Ethereum price prediction model + feature names
+#with open("ethereum_price_prediction_model.pkl", "rb") as f:
+#    model_data = pickle.load(f)
+
+
+# Load model + feature names (from a list)
 with open("price_prediction_model.pkl", "rb") as f:
     model_data = pickle.load(f)
 
-# Handle different pickle formats
-if isinstance(model_data, dict):
-    model = model_data["model"]
-    feature_names = model_data["feature_names"]
-elif isinstance(model_data, (list, tuple)):
-    model = model_data[0]
-    feature_names = model_data[1]
-else:
-    raise ValueError("Unsupported model_data format in pickle file")
+model = model_data["model"]         # first item in list
+feature_names = model_data["feature_names"] # second item in list
 
-# ===============================
-# Global log storage
-# ===============================
+
+
+#model = model_data["model"]
+#feature_names = model_data["feature_names"]
+
+# Global DataFrame log
 log_df = pd.DataFrame()
 data_counter = 0
 
 
-# ===============================
-# Prediction Route
-# ===============================
+
 @app.route("/predict", methods=["POST"])
 def predict():
     global log_df, data_counter
@@ -37,40 +34,47 @@ def predict():
     try:
         data = request.json
         print("Incoming JSON:", data)
-        
-         # 👇 insert here
-        missing_features = [col for col in feature_names if col not in data]
-        print("Missing features (filled with 0.0):", missing_features)
 
-        # ✅ Create DataFrame with all required features (missing → 0.0)
+        # Extract features from JSON
+        extracted_features = {
+            "Open": float(data.get("Open", 0)),
+            "High": float(data.get("High", 0)),
+            "Low": float(data.get("Low", 0)),
+            "Close": float(data.get("Close", 0)),
+            "Volume": float(data.get("Volume", 0)),
+            "VWAP": float(data.get("VWAP", 0)),
+            "Target": float(data.get("Target", 0))
+        }
+
+        # Prepare DataFrame for model
         features_for_model = pd.DataFrame(
-            [[float(data.get(col, 0.0)) for col in feature_names]],
+            [[extracted_features[col] for col in feature_names]],
             columns=feature_names
         )
 
-        # ✅ Prediction
+        # Make prediction
         prediction = model.predict(features_for_model)[0]
 
-        # ✅ Map prediction to label
+        # Map prediction to signal
         result = "Buy" if prediction == 1 else "Sell / Hold"
 
-        # ✅ Build log entry
+        # Build log row=
         data_counter += 1
         new_row = {
             "Data No.": data_counter,
-            "Timestamp": data.get("timestamp"),
-            "Asset_ID": data.get("Asset_ID"),
+            "Timestamp": data.get("timestamp", None),
+            "Asset_ID": data.get("Asset_ID", None),
             "Asset_Name": data.get("Asset_Name", None),
-            **{col: features_for_model[col].iloc[0] for col in feature_names},
+            **extracted_features,
             "Prediction": result
         }
 
-        # ✅ Append to log
+        # Append to log
         log_df = pd.concat([log_df, pd.DataFrame([new_row])], ignore_index=True)
 
-        # ✅ Print log for debugging
+        # Print log
         print("\n========= Prediction Log =========")
-        print(log_df.tail().to_string(index=False))
+        print(log_df.to_string(index=False))
         print("==================================\n")
 
         return jsonify({
@@ -82,10 +86,5 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# ===============================
-# Run Flask App
-# ===============================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
