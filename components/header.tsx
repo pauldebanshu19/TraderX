@@ -16,7 +16,6 @@ export default function Header() {
   const [isConnected, setIsConnected] = useState(false)
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
-  const [showDashboard, setShowDashboard] = useState(false)
 
   // Check if MetaMask is installed
   const isMetaMaskInstalled = () => {
@@ -84,6 +83,7 @@ export default function Header() {
       })
       setIsConnected(true)
       toast.success('MetaMask connected successfully!')
+      // Stay on current page; show connected account in header
     } catch (error) {
       console.error('Error getting wallet info:', error)
       toast.error('Failed to get wallet information')
@@ -127,13 +127,9 @@ export default function Header() {
   const handleDisconnect = () => {
     setIsConnected(false)
     setWalletInfo(null)
-    setShowDashboard(false)
     toast.success('Wallet disconnected')
   }
 
-  const openDashboard = () => {
-    setShowDashboard(true)
-  }
 
   return (
     <>
@@ -189,7 +185,7 @@ export default function Header() {
 
             {/* Nav links */}
             <nav className="hidden items-center gap-8 text-sm md:flex">
-              <Link href="#home" className="hidden text-base font-semibold tracking-wide text-white sm:inline">Home</Link>
+              <Link href="/" className="hidden text-base font-semibold tracking-wide text-white sm:inline">Home</Link>
               <Link href="#about" className="hidden text-base font-semibold tracking-wide text-white sm:inline">About</Link>
               <Link href="#contact" className="hidden text-base font-semibold tracking-wide text-white sm:inline">Contact</Link>
             </nav>
@@ -222,18 +218,6 @@ export default function Header() {
                     </span>
                   </div>
                   
-                  {/* Dashboard Button */}
-                  <Button
-                    onClick={openDashboard}
-                    className="relative rounded-full bg-gradient-to-r from-purple-600 to-blue-600 px-5 text-white 
-                     shadow-[inset_0_0_0_2px_rgba(255,255,255,0.12)] 
-                     hover:from-purple-700 hover:to-blue-700 border border-white/10 
-                     transition-all duration-300 ease-in-out
-                     hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30"
-                  >
-                    Dashboard
-                  </Button>
-                  
                   {/* Disconnect Button */}
                   <Button
                     onClick={handleDisconnect}
@@ -251,94 +235,7 @@ export default function Header() {
           </div>
         </div>
       </header>
-
-      {/* Dashboard Modal */}
-      {showDashboard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white">TraderX Dashboard</h2>
-              <button
-                onClick={() => setShowDashboard(false)}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Dashboard Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Wallet Info Card */}
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4">Wallet Info</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Address:</span>
-                    <span className="text-white font-mono text-sm">
-                      {walletInfo?.address.slice(0, 8)}...{walletInfo?.address.slice(-6)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Balance:</span>
-                    <span className="text-white font-semibold">{walletInfo?.balance} ETH</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Network:</span>
-                    <span className="text-white">
-                      {walletInfo?.chainId === '0x1' ? 'Ethereum Mainnet' : 
-                       walletInfo?.chainId === '0x89' ? 'Polygon' :
-                       walletInfo?.chainId === '0x38' ? 'BSC' : 'Unknown'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Actions Card */}
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-                <div className="space-y-3">
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
-                    Send Transaction
-                  </button>
-                  <button className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all">
-                    Swap Tokens
-                  </button>
-                  <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all">
-                    View History
-                  </button>
-                </div>
-              </div>
-
-              {/* AI Assistant Card */}
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4">AI Assistant</h3>
-                <p className="text-gray-300 text-sm mb-4">
-                  Get AI-powered insights and automated trading assistance
-                </p>
-                <button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all">
-                  Start AI Chat
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <div className="text-center text-gray-400 py-8">
-                  <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <p>No recent transactions</p>
-                  <p className="text-sm">Your transaction history will appear here</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Dashboard UI removed from header */}
     </>
   )
 }
