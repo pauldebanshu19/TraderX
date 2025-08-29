@@ -5,6 +5,7 @@ A modern, AI-powered cryptocurrency trading platform that combines blockchain te
 ## 🚀 Features
 
 - **AI-Powered Trading Assistant**: Chat with an intelligent AI agent that can help with trading decisions
+- **Price Prediction Model**: Machine learning model for cryptocurrency price predictions
 - **Wallet Integration**: Secure wallet creation and management with private key backup
 - **Gasless Transactions**: Execute transactions without holding native tokens for gas fees
 - **Smart Account Support**: Advanced account abstraction features
@@ -16,7 +17,8 @@ A modern, AI-powered cryptocurrency trading platform that combines blockchain te
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **Styling**: Tailwind CSS, Framer Motion
 - **Blockchain**: 0xGasless AgentKit, Viem
-- **AI**: LangChain, OpenAI GPT-4
+- **AI & ML**: LangChain, OpenAI GPT-4, scikit-learn
+- **Data Analysis**: Pandas, NumPy, Matplotlib
 - **State Management**: React Hooks
 - **UI Components**: Radix UI, Lucide React
 
@@ -26,8 +28,10 @@ Before running this project, you'll need:
 
 1. **Node.js** (v18 or higher)
 2. **npm** or **yarn**
-3. **0xGasless API Key** - Get one from [0xGasless](https://0xgasless.com)
-4. **OpenRouter API Key** - Get one from [OpenRouter](https://openrouter.ai)
+3. **Python** (v3.7 or higher)
+4. **Conda** or **venv** for Python environment management
+5. **0xGasless API Key** - Get one from [0xGasless](https://0xgasless.com)
+6. **OpenRouter API Key** - Get one from [OpenRouter](https://openrouter.ai)
 
 ## 🚀 Quick Start
 
@@ -68,6 +72,18 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 5. Set Up the ML Environment
+
+```bash
+cd Price\ Predictor\ Model\ ML
+conda create -n venv python=3.7
+conda activate venv/
+pip install -r requirements.txt
+python app.py
+```
+
+The ML service will start on [http://localhost:5000](http://localhost:5000).
 
 ## 🔧 Configuration
 
@@ -139,6 +155,11 @@ traderx/
 │   └── wallet.ts          # Wallet utilities
 ├── public/                # Static assets
 └── Price Predictor Model ML/ # ML model files
+    ├── app.py            # Flask API for price predictions
+    ├── data.csv          # Training data
+    ├── listener.py       # Real-time data listener
+    ├── price.ipynb       # Model development notebook
+    └── requirements.txt  # Python dependencies
 ```
 
 ## 🔒 Security
