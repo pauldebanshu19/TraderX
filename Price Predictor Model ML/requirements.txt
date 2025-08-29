@@ -1,2 +1,7 @@
 Flask
 pandas
+scikit-learn
+numpy
+matplotlib
+scikeras
+seaborn
